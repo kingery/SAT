@@ -1,4 +1,4 @@
-# Copyright (C) R. Scout Kingery, 2013
+# R. Scout Kingery, 2013
 # University of Southern California
 # Ming Hsieh Dept. of Electrical Engineering
 # Communication Sciences Institiute
@@ -30,6 +30,7 @@ import linecache
 import numpy as np
 import itertools
 import SATfunctions
+import circuit
 from subprocess import call
 
 class Code(object):
@@ -62,14 +63,6 @@ class Code(object):
             if line.strip():
                 C.append(eval(line))
         (self.cnf,self.variables) = SATfunctions.circuit_to_cnf(C)
-
-    def generateDimacs(self,dimacsfile):
-    ###generates a dimacs file from the CNF form
-        dimacs = SATfunctions.cnf_to_dimacs(self.cnf)
-
-        f = open(dimacsfile,'w')
-        f.write(dimacs)
-        f.close()
 
     def getValues(self,lookupfile):
     ### method to return satisfying values for a,b,c,e, etc.
@@ -198,21 +191,6 @@ class Code(object):
         self.propogatedVectors[self.N-self.K+self.logicalOpIndex] = np.zeros(2*self.M)
 
     def determineHBasis(self):
-    ### take the propogated vectors and determine a basis for stabilizers of ancillary code
-    ### generates and updates an array containing the entire span of the basis
-    ### NOT EFFICIENT!!! EXPONENTIAL TIME PROCESS!!!
-
-        # self.hBasis = np.zeros(2*self.M)
-        # self.span = np.zeros(2*self.M)
-        
-        # for vector in self.propogatedVectors:
-        #     if vector not in self.span:
-        #         # vector not in span, add it to the basis
-        #         self.hBasis = np.concatenate((self.hBasis,vector)
-        #         # update the new span
-        #         spanUpdate = np.mod(self.span + vector,2)
-        #         self.span = np.concatenate((self.span,spanUpdate))
-
     ### take the propogated vectors and determine a basis for stabilizers of ancillary code
     ### uses Gaussian elimination to determine if vector is in the span efficiently
 
@@ -384,30 +362,3 @@ class Code(object):
         f = open(self.dimacsfile,'a')
         f.write(newClause)
         f.close()
-
-# def getValues(circuitfile,minisat_output,code):
-# ### method to return satisfying values for a,b,c,e, etc.
-# ### circuitfile must be a closed file
-#     Rsat=np.ones([2*code.N,2*code.N],int)   #create empty np array
-#     code.a = np.ones(code.M,int)
-#     code.b = np.ones(code.M,int)
-#     code.c = np.ones(code.M,int)
-#     code.e = np.ones(code.M,int)
-
-#     # determine satisfying assignment for a,b,c,e
-#     for i in range(code.M):
-
-#         lineIndex = variables['a_%d' % i]
-#         if '-' in linecache.getline(minisat_output,lineIndex+1):
-#             code.a[i]=0
-#         lineIndex = variables['b_%d' % i]
-#         if '-' in linecache.getline(minisat_output,lineIndex+1):
-#             code.b[i]=0
-#         lineIndex = variables['c_%d' % i]
-#         if '-' in linecache.getline(minisat_output,lineIndex+1):
-#             code.c[i]=0
-#         lineIndex = variables['e_%d' % i]
-#         if '-' in linecache.getline(minisat_output,lineIndex+1):
-#             code.e[i]=0
-
-
